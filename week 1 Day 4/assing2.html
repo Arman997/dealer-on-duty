@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>calculator</title>
+    <style>
+        body { 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            background: rgb(31, 29, 29); 
+        }
+
+        .calculator-grid {
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 10px; 
+            background-color: rgb(31, 29, 29);
+            width: 500px;
+            height: 600px;
+        }
+
+        .calculator-grid .special {
+            background-color: rgb(218, 142, 2);
+            color: white;
+        }
+
+        .calculator-grid .special1 {
+            background-color: grey;
+            color:  rgb(31, 29, 29);
+        }
+
+        .calculator-grid button {
+            width: 100px;
+            height: 100px;
+            background-color: rgb(43, 42, 42);
+            color: white;
+            border: 1px solid rgb(43, 42, 42);
+            border-radius: 50%;
+            padding: 26px;
+            margin: 5px;
+            font-size: 30px;
+        }
+
+        .calculator-grid button:hover{
+            background-color: gray;
+            transition: background-color 0.3s ease; 
+        }
+
+        .calculator-grid .special:hover {
+            background-color: rgb(197, 165, 106);
+        }
+
+        .calculator-grid .special1:hover {
+            background-color: rgb(175, 171, 171);
+            color:  rgb(31, 29, 29);
+        }
+
+        .calculator-grid .zero-button {
+            width: 215px;
+            height: 100px;
+            font-size: 40px;
+            border-radius: 100px;
+            text-align: left;
+        }
+
+        .output{
+            grid-column: 1 / -1;
+            background-color:  rgb(31, 29, 29);
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            flex-direction: column;
+            width: 100%;
+            height: 300px;
+        }
+
+        .output .result{
+            color: white;
+            font-size: 50px;
+            margin-top: 200px;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator-grid">
+        <div class="output">
+            <div class="result"></div>
+        </div>
+        <button class="special1">AC</button>
+        <button class="special1">+/-</button>
+        <button class="special1">%</button>
+        <button class="special">/</button>
+        <button>7</button>
+        <button>8</button>
+        <button>9</button>
+        <button class="special">x</button>
+        <button>4</button>
+        <button>5</button>
+        <button>6</button>
+        <button class="special">-</button>
+        <button>1</button>
+        <button>2</button>
+        <button>3</button>
+        <button class="special">+</button>
+        <button class="zero-button">0</button>
+        <button>,</button>
+        <button class="special">=</button>
+    </div>
+    <script>
+        const resultElement = document.querySelector(".result");
+        const calculatorButtons = document.querySelectorAll(".calculator-grid button, .calculator-grid .special, .calculator-grid .special1, .calculator-grid .zero-button");
+
+        let currentInput = "";
+        let currentOperator = "";
+        let firstOperand = null;
+
+        // Function to update the result display
+        function updateResultDisplay() {
+            resultElement.textContent = currentInput;
+        }
+
+        function handleButtonClick(event){
+            const buttonValue= event.target.textContent;
+
+            if(!isNaN(buttonValue) || buttonValue=== ","){
+                    currentInput += buttonValue;
+                    updateResultDisplay()
+            }
+            
+            if (buttonValue === "+/-") {
+                if (currentInput !== "") {
+                    if (!isNaN(currentInput)) {
+                        currentInput = (parseFloat(currentInput) * -1).toString();
+                        updateResultDisplay();
+                    } else {
+                        currentInput = "Error";
+                        updateResultDisplay();
+                    }
+                }
+                return;
+            }
+
+            if(['+', '-', 'x', '/'].includes(buttonValue)){
+                if(currentOperator !== ""){
+                    if(currentOperator !== ""){
+                        firstOperand= parseFloat(currentInput);
+                        currentInput = "";
+                        currentOperator= buttonValue;
+                    }
+                } else{
+                    firstOperand= parseFloat(currentInput);
+                    currentInput = "";
+                    currentOperator= buttonValue;
+                }
+            }
+
+            if (buttonValue === "=") {
+                if (currentOperator !== "" && currentInput !== "" && firstOperand !== null) {
+                    const secondOperand = parseFloat(currentInput);
+                    switch (currentOperator) {
+                        case "+":
+                            currentInput = (firstOperand + secondOperand).toString();
+                            break;
+                        case "-":
+                            currentInput = (firstOperand - secondOperand).toString();
+                            break;
+                        case "x":
+                            currentInput = (firstOperand * secondOperand).toString();
+                            break;
+                        case "/":
+                            if (secondOperand === 0) {
+                                currentInput = "Error"; // Division by zero
+                            } else {
+                                currentInput = (firstOperand / secondOperand).toString();
+                            }
+                            break;
+                    }
+                    currentOperator = "";
+                    firstOperand = null;
+                    updateResultDisplay();
+                }
+            }
+
+            if(buttonValue== "AC"){
+                currentInput= "";
+                currentOperator= "";
+                firstOperand= null;
+                updateResultDisplay();
+            }
+        }
+
+        calculatorButtons.forEach(button => {
+            button.addEventListener("click", handleButtonClick);
+        });
+    </script>
+</body>
+</html>
